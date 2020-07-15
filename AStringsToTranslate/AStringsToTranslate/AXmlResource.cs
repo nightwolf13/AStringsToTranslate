@@ -13,7 +13,8 @@ namespace AStringsToTranslate
 	[DebuggerDisplay("{Language}")]
 	public class AXmlResource : List<AXmlResourceItem>
 	{
-		public string Language { get; set; }
+		public string Language => FolderParts.Length > 1 ? FolderParts[1] : "source";
+		public string[] FolderParts { get; set; }
 	}
 
 	public abstract class AXmlResourceItem

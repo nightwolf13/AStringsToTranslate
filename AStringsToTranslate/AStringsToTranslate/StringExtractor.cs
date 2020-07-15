@@ -19,7 +19,7 @@ namespace AStringsToTranslate
 		public void Extract()
 		{
 			AXmlResource sourceRes;
-			AXmlResource[] projResources = AXmlHelper.ReadAllFiles(this.Options.ProjectPath, out sourceRes);
+			AXmlResource[] projResources = AXmlHelper.ReadAllFiles(this.Options.ProjectPath, this.Options.SourceLanguage, out sourceRes);
 
 			if (sourceRes == null)
 			{
@@ -30,7 +30,7 @@ namespace AStringsToTranslate
 			{
 				AXmlResource projResource = projResources[i];
 				Console.WriteLine($"Processing {projResource.Language}");
-				var targetResource = new AXmlResource() { Language = projResource.Language };
+				var targetResource = new AXmlResource() { FolderParts = projResource.FolderParts };
 				foreach (var resString in sourceRes)
 				{
 					if (!projResource.Any(r => r.Name == resString.Name))
@@ -45,7 +45,8 @@ namespace AStringsToTranslate
 				}
 
 				Console.WriteLine($"Saving {projResource.Language}");
-				AXmlHelper.SaveAXml(targetResource, Path.Combine(this.Options.TargetPath, targetResource.Language, "strings.xml"));
+
+				AXmlHelper.SaveAXml(targetResource, Path.Combine(this.Options.TargetPath, String.Join("-", targetResource.FolderParts), "strings.xml"));
 			}
 
 			Console.WriteLine("Saving initial file (source.xml)");

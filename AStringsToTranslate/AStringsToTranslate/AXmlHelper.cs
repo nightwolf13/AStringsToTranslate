@@ -19,7 +19,7 @@ namespace AStringsToTranslate
 		private const string N_ITEM = "item";
 		private const string A_QUANTITY = "quantity";
 
-		public static AXmlResource[] ReadAllFiles(string aProjPath, out AXmlResource sourceFile)
+		public static AXmlResource[] ReadAllFiles(string aProjPath, string sourceLan, out AXmlResource sourceFile)
 		{
 			DirectoryInfo aProjDir = new DirectoryInfo(Path.Combine(aProjPath, AXmlHelper.AXML_PATH));
 
@@ -43,9 +43,18 @@ namespace AStringsToTranslate
 				if (resource == null)
 					continue;
 
-				if(aFile.Directory.Name == "values")
+				if (!string.IsNullOrEmpty(sourceLan))
 				{
-					sourceFile = resource;
+					if (String.Compare(resource.Language, sourceLan, true) == 0)
+					{
+						sourceFile = resource;
+					}
+				} else
+				{
+					if (aFile.Directory.Name == "values")
+					{
+						sourceFile = resource;
+					}
 				}
 
 				aResources.Add(resource);
@@ -58,11 +67,7 @@ namespace AStringsToTranslate
 		{
 			AXmlResource res = null;
 			DirectoryInfo dir = new DirectoryInfo(Path.GetDirectoryName(path));
-			string language = "en";
-			if (dir.Name.Contains("-"))
-			{
-				language = dir.Name.Substring(dir.Name.IndexOf("-") + 1);
-			}
+			string[] folderParts = dir.Name.Split('-');
 
 			using (XmlReader reader = XmlReader.Create(path, new XmlReaderSettings() { IgnoreComments = false }))
 			{
@@ -155,7 +160,7 @@ namespace AStringsToTranslate
 
 			if (res != null)
 			{
-				res.Language = language;
+				res.FolderParts = folderParts;
 			}
 
 			return res;
